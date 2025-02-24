@@ -1,21 +1,33 @@
 const { modelMakanan } = require("../models/relasi.js");
 const { check, validationResult } = require("express-validator");
+const baseUrl = "http://localhost:3000/uploads";
 const path = require("path");
 const fs = require("fs/promises");
 
 // Ambil semua data makanan
+// Ambil semua data makanan
 const getData = async (req, res) => {
     try {
         const makanan = await modelMakanan.findAll();
+
+        // Tambahkan URL untuk setiap gambar
+        const makananWithImageUrl = makanan.map(item => {
+            return {
+                ...item.toJSON(),
+                gambar: item.gambar ? `${baseUrl}/${item.gambar}` : null
+            };
+        });
+
         res.json({
             status: 200,
-            message: "Data Makanan",
-            data: makanan
+            message: "Data Makanan gada isi",
+            data: makananWithImageUrl
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 // Validasi input
 const validasi = [
@@ -38,44 +50,41 @@ const validasi = [
     })
 ];
 
-// Tambah data makanan
+    
 const createData = async (req, res) => {
     try {
-        // const errors = validationResult(req);
-        // if (!errors.isEmpty()) {    
-        //     if (req.file) {
-        //         await fs.unlink(req.file.path);
-        //     }
-        //     return res.status(400).json({ message: errors.array() });
-        // }
-
-        const { nama , harga_baru, harga_lama, deskripsi, user_id} = req.body;
+        const { nama, harga_baru, harga_lama, deskripsi, user_id } = req.body;
         const gambarMakanan = req.file ? req.file.filename : null;
 
         if (!gambarMakanan) {
             return res.status(400).json({ message: "Gambar tidak boleh kosong" });
         }
 
+        // Base URL server tempat menyimpan gambar
+        const baseUrl = "https://ahmad.rikpetik.site/uploads";
+
         const makananBaru = await modelMakanan.create({
             nama,
             harga_baru,
             harga_lama,
             deskripsi,
-            gambar: gambarMakanan,
+            gambar: gambarMakanan, // Simpan nama file saja di database
             user_id
         });
 
         res.status(201).json({
             status: 201,
             message: "Data makanan berhasil ditambahkan",
-            data: makananBaru
+            data: {
+                ...makananBaru.toJSON(),
+                gambar: `${baseUrl}/${gambarMakanan}` // Gambar otomatis berisi URL
+            }
         });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
 
-// Ambil data makanan berdasarkan ID
 const findData = async (req, res) => {
     try {
         const id = req.params.id;
@@ -97,13 +106,7 @@ const findData = async (req, res) => {
 // Update data makanan
 const updateData = async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            if (req.file) {
-                await fs.unlink(req.file.path);
-            }
-            return res.status(400).json({ message: errors.array() });
-        }
+      
 
         const id = req.params.id;
         const makanan = await modelMakanan.findByPk(id);
