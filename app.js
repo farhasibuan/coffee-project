@@ -6,6 +6,7 @@ const routerMakanan = require("./app/api/v1/makanan/router");
 const routerMinuman = require("./app/api/v1/minuman/router");
 const routerUser = require("./app/api/v1/user/router");
 const routerOrder = require("./app/api/v1/order/router");
+const routerBrand = require("./app/api/v1/brand/route");
 
 
 const app = express();
@@ -30,7 +31,7 @@ app.use(path, routerMakanan);
 app.use(path, routerMinuman);
 app.use(path, routerUser);
 app.use(path, routerOrder);
-
+app.use(path, routerBrand);
 
 // Menjalankan server
 app.listen(3000, () => {

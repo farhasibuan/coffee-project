@@ -1,26 +1,30 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../../../utils/config_db.js");
+const { Sequelize, DataTypes } = require("sequelize");
+const sequelize = require("../../../utils/config_db");
 
-const Brand = sequelize.define("brand", {
+
+const modelBrand = sequelize.define(
+  "brand",
+  {
     id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        autoIncrement: true
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
     nama: {
-        type: DataTypes.STRING(50),
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
     },
     logo: {
-        type: DataTypes.STRING(100),
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-}, {
-    freezeTableName: true
-});
+  },
+  {
+    tableName: "brands",
+    timestamps: false,
+  }
+);
 
-// Sinkronisasi model dengan database
-sequelize.sync();
 
-module.exports = Minuman;
+module.exports = { modelBrand };

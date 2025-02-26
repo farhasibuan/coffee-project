@@ -6,10 +6,10 @@ const bcrypt = require("bcrypt");
 const getData = async (req, res) => {
     try {
         const users = await modelUser.findAll({
-            attributes: ["id", "nama", "email", "createdAt", "updatedAt"]
+            attributes: ["id", "nama", "email", "jenisKelamin", "noHandphone", "tanggalLahir", "kota", "createdAt", "updatedAt"]
         });
 
-        res.json({
+        res.status(200).json({
             status: 200,
             message: "Data User",
             data: users
@@ -30,37 +30,30 @@ const validasi = [
 // POST: Tambah user baru
 const createData = async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ message: errors.array() });
-        }
-
         const { nama, email, jenisKelamin, noHandphone, tanggalLahir, kota, password } = req.body;
 
-        // Cek apakah email sudah digunakan
-        const existingUser = await modelUser.findOne({ where: { email } });
-        if (existingUser) {
-            return res.status(400).json({ message: "Email sudah terdaftar" });
+        if (!nama || !email || !jenisKelamin || !noHandphone || !tanggalLahir || !kota || !password) {
+            return res.status(400).json({ message: "Semua field harus diisi" });
         }
 
-        // Hash password sebelum menyimpan
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = await modelUser.create({
             nama,
+            email,
             jenisKelamin,
             noHandphone,
             tanggalLahir,
             kota,
-            email,
             password: hashedPassword
         });
 
-        res.json({
+        res.status(201).json({
             status: 201,
             message: "User berhasil ditambahkan",
             data: newUser
         });
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -72,7 +65,7 @@ const findData = async (req, res) => {
         const id = req.params.id;
         const user = await modelUser.findOne({
             where: { id },
-            attributes: ["id", "nama", "email", "createdAt", "updatedAt"]
+            attributes: ["id", "nama", "email", "jenisKelamin", "noHandphone", "tanggalLahir", "kota", "createdAt", "updatedAt"]
         });
 
         if (!user) {
@@ -92,11 +85,6 @@ const findData = async (req, res) => {
 // PUT: Update data user
 const updateData = async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ message: errors.array() });
-        }
-
         const id = req.params.id;
         const { nama, email, password } = req.body;
 
@@ -145,11 +133,4 @@ const deleteData = async (req, res) => {
     }
 };
 
-module.exports = {
-    getData,
-    createData,
-    validasi,
-    findData,
-    updateData,
-    deleteData
-};
+module.exports = { getData, createData, validasi, findData, updateData, deleteData };

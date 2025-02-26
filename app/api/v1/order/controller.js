@@ -1,5 +1,5 @@
 const modelOrder = require("./model");
-
+const path = require ("path")
 const baseUrl = "https://ahmad.rikpetik.site/uploads"; 
 
 const getAllOrders = async (req, res) => {
@@ -23,9 +23,6 @@ const getAllOrders = async (req, res) => {
 
 const createOrder = async (req, res) => {
     try {
-        console.log("Request Body:", req.body);
-        console.log("Request File:", req.file);
-
         const { nama } = req.body;
         const logoFile = req.file ? req.file.filename : null;
 
@@ -37,21 +34,19 @@ const createOrder = async (req, res) => {
             return res.status(400).json({ message: "Logo tidak boleh kosong" });
         }
 
-        // Cek apakah nama atau logo sudah ada di database
-        const existingOrder = await modelOrder.findOne({
-            where: {
-                [Op.or]: [
-                    { nama },
-                    { logo: logoFile }
-                ]
-            }
-        });
-
-        if (existingOrder) {
-            return res.status(400).json({ message: "Nama atau logo sudah digunakan" });
+        
+        const existingNama = await modelOrder.findOne({ where: { nama } });
+        if (existingNama) {
+            return res.status(400).json({ message: "Nama sudah digunakan" });
         }
 
-        // Jika validasi lolos, buat order baru
+        
+        const existingLogo = await modelOrder.findOne({ where: { logo: logoFile } });
+        if (existingLogo) {
+            return res.status(400).json({ message: "Logo sudah digunakan" });
+        }
+
+     
         const newOrder = await modelOrder.create({
             nama,
             logo: logoFile
@@ -70,6 +65,35 @@ const createOrder = async (req, res) => {
     }
 };
 
+const deleteOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await modelOrder.findByPk(id);
+
+        if (!order) {
+            return res.status(404).json({ message: "Data tidak ditemukan" });
+        }
+
+        
+        if (order.logo) {
+            const imagePath = path.join(__dirname, "../../../public/uploads", order.logo);
+            try {
+                await fs.unlink(imagePath);
+            } catch (err) {
+                console.error("Gagal menghapus logo:", err.message);
+            }
+        }
+
+        await order.destroy();
+
+        res.status(200).json({ 
+            status: 200,
+            message: "Data order berhasil dihapus"
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
 
 
-module.exports = { getAllOrders, createOrder };
+module.exports = { getAllOrders, createOrder, deleteOrder };
