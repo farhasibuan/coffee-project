@@ -5,13 +5,15 @@ const multer = require("multer");  // Import multer untuk upload file
 const routerMakanan = require("./app/api/v1/makanan/router");
 const routerMinuman = require("./app/api/v1/minuman/router");
 const routerUser = require("./app/api/v1/user/router");
+const routerOrder = require("./app/api/v1/order/router");
+
 
 const app = express();
 const path = "/api/v1";
 
 // Setup multer untuk upload file
 const upload = multer({
-    dest: "app/public/uploads/"  // Menentukan lokasi penyimpanan file upload
+    dest: "app/public/uploads/"  
 });
 
 // Middleware untuk parse request body
@@ -27,8 +29,11 @@ app.use("/uploads", express.static(pathStatic.join(__dirname, "app/public/upload
 app.use(path, routerMakanan);
 app.use(path, routerMinuman);
 app.use(path, routerUser);
+app.use(path, routerOrder);
+
 
 // Menjalankan server
 app.listen(3000, () => {
+    console.log('jalan ngab');
     
 })
