@@ -1,4 +1,4 @@
-const { modelOrder } = require("./model.js");
+const { modelBrand } = require("./model.js");
 const { check, validationResult } = require("express-validator");
 const path = require("path");
 const fs = require("fs/promises");
@@ -7,15 +7,15 @@ const { get } = require("http");
 const createData = async (req, res) => {
   try {
     const { nama, logo } = req.body;
-    const logoOrder = req.file ? req.file.filename : null;
+    const logoBrand = req.file ? req.file.filename : null;
 
-    if (!logoOrder) {
+    if (!logoBrand) {
       return res.status(400).json({ message: "Gambar tidak boleh kosong" });
     }
 
     const baseUrl = "https://ahmad.rikpetik.site/uploads";
 
-    const order = await modelOrder.create({
+    const brand = await modelBrand.create({
       nama,
       logo,
     });
@@ -24,8 +24,8 @@ const createData = async (req, res) => {
       status: 201,
       message: "Data logo di tambahkan",
       data: {
-        ...order.toJSON(),
-        gambar: `${baseUrl}/${logoOrder}`,
+        ...brand.toJSON(),
+        gambar: `${baseUrl}/${logoBrand}`,
       },
     });
   } catch (error) {
@@ -35,10 +35,10 @@ const createData = async (req, res) => {
 
 const getData = async (req, res) => {
   try {
-    const order = await modelOrder.findAll();
+    const brand = await modelBrand.findAll();
 
     // Tambahkan URL untuk gambar
-    const orderWithImageUrl = order.map((item) => {
+    const brandWithImageUrl = brand.map((item) => {
       return {
         ...item.toJSON(),
         gambar: item.gambar ? `${baseUrl}/${item.gambar}` : null,
@@ -47,8 +47,8 @@ const getData = async (req, res) => {
 
     res.json({
       status: 200,
-      message: "Data order masih kosong",
-      data: orderWithImageUrl,
+      message: "Data brand masih kosong",
+      data: brandWithImageUrl,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -58,7 +58,7 @@ const getData = async (req, res) => {
 const findData = async (req, res) => {
   try {
     const id = req.params.id;
-    const hasil = await modelOrder.findByPk(id);
+    const hasil = await modelBrand.findByPk(id);
 
     if (!hasil) {
       return res.status(404).json({ message: "Data tidak ditemukan" });
