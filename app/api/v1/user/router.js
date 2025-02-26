@@ -7,6 +7,6 @@ router.get("/user", getData);
 router.post("/user/create", validasi, createData);
 router.put("/user/update/:id", validasi, updateData);
 router.get("/user/:id", findData);
-router.delete("/user/:id", deleteData);
+router.delete("/user/delete/:id", deleteData);
 
 module.exports = router;

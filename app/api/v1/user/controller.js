@@ -35,7 +35,7 @@ const createData = async (req, res) => {
             return res.status(400).json({ message: errors.array() });
         }
 
-        const { nama, email, password } = req.body;
+        const { nama, email, jenisKelamin, noHandphone, tanggalLahir, kota, password } = req.body;
 
         // Cek apakah email sudah digunakan
         const existingUser = await modelUser.findOne({ where: { email } });
@@ -48,6 +48,10 @@ const createData = async (req, res) => {
 
         const newUser = await modelUser.create({
             nama,
+            jenisKelamin,
+            noHandphone,
+            tanggalLahir,
+            kota,
             email,
             password: hashedPassword
         });
