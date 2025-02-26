@@ -12,13 +12,9 @@ const Minuman = sequelize.define("minuman", {
         type: DataTypes.STRING(50),
         allowNull: false
     },
-    harga_baru: {
+    harga: {
         type: DataTypes.INTEGER,
         allowNull: false
-    },
-    harga_lama: {
-        type: DataTypes.INTEGER,
-        allowNull: true
     },
     deskripsi: {
         type: DataTypes.TEXT,
